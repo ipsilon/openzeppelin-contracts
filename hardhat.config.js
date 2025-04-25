@@ -8,6 +8,7 @@
 // - COINMARKETCAP: coinmarketcap api key for USD value in gas report
 // - CI:            output gas report to file instead of stdout
 
+const { TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD } = require('hardhat/builtin-tasks/task-names');
 const fs = require('fs');
 const path = require('path');
 
@@ -33,7 +34,7 @@ const { argv } = require('yargs/yargs')()
     ir: {
       alias: 'enableIR',
       type: 'boolean',
-      default: false,
+      default: true,
     },
     evm: {
       alias: 'evmVersion',
@@ -68,6 +69,24 @@ for (const f of fs.readdirSync(path.join(__dirname, 'hardhat'))) {
   require(path.join(__dirname, 'hardhat', f));
 }
 
+subtask(TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD, async (args, hre, runSuper) => {
+  if (args.solcVersion === '0.8.30') {
+    const compilerPath = path.join('/Users/rodia/projects/solidity1/build/solc/', 'solc');
+
+    return {
+      compilerPath,
+      isSolcJs: false, // if you are using a native compiler, set this to false
+      version: args.solcVersion,
+      // this is used as extra information in the build-info files, but other than
+      // that is not important
+      longVersion: '0.8.5-nightly.2021.5.12+commit.98e2b4e5',
+    };
+  }
+
+  // we just use the default subtask if the version is not 0.8.5
+  return runSuper();
+});
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -79,7 +98,8 @@ module.exports = {
         enabled: true,
         runs: argv.runs,
       },
-      evmVersion: argv.evm,
+      evmVersion: 'osaka',
+      eofVersion: 1,
       viaIR: argv.ir,
       outputSelection: { '*': { '*': ['storageLayout'] } },
     },

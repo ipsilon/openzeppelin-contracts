@@ -174,7 +174,7 @@ library SafeERC20 {
         uint256 returnSize;
         uint256 returnValue;
         assembly ("memory-safe") {
-            let success := call(gas(), token, 0, add(data, 0x20), mload(data), 0, 0x20)
+            let success := iszero(extcall(token, add(data, 0x20), mload(data), 0))
             // bubble errors
             if iszero(success) {
                 let ptr := mload(0x40)
@@ -182,6 +182,8 @@ library SafeERC20 {
                 revert(ptr, returndatasize())
             }
             returnSize := returndatasize()
+            // TODO: use RETURNDATALOAD when supported in solc
+            returndatacopy(0, 0, 0x20)
             returnValue := mload(0)
         }
 
@@ -203,7 +205,9 @@ library SafeERC20 {
         uint256 returnSize;
         uint256 returnValue;
         assembly ("memory-safe") {
-            success := call(gas(), token, 0, add(data, 0x20), mload(data), 0, 0x20)
+            success := iszero(extcall(token, add(data, 0x20), mload(data), 0))
+            // TODO: use RETURNDATALOAD when supported in solc
+            returndatacopy(0, 0, 0x20)
             returnSize := returndatasize()
             returnValue := mload(0)
         }

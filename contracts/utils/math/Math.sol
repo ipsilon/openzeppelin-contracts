@@ -427,7 +427,10 @@ library Math {
 
             // Given the result < m, it's guaranteed to fit in 32 bytes,
             // so we can use the memory scratch space located at offset 0.
-            success := staticcall(gas(), 0x05, ptr, 0xc0, 0x00, 0x20)
+            success := iszero(extstaticcall(0x05, ptr, 0xc0))
+            // TODO: use RETURNDATALOAD when supported in solc
+            // result := returndataload(0x00)
+            returndatacopy(0, 0, returndatasize())
             result := mload(0x00)
         }
     }
@@ -461,7 +464,9 @@ library Math {
         assembly ("memory-safe") {
             let dataPtr := add(result, 0x20)
             // Write result on top of args to avoid allocating extra memory.
-            success := staticcall(gas(), 0x05, dataPtr, mload(result), dataPtr, mLen)
+            success := iszero(extstaticcall(0x05, dataPtr, mload(result)))
+            // TODO: use RETURNDATALOAD when supported in solc
+            returndatacopy(dataPtr, 0, mLen)
             // Overwrite the length.
             // result.length > returndatasize() is guaranteed because returndatasize() == m.length
             mstore(result, mLen)

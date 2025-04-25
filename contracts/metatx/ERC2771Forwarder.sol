@@ -318,7 +318,9 @@ contract ERC2771Forwarder is EIP712, Nonces {
             // |-----------|----------|--------------------------------------------------------------------|
             // |           |          |                                                           result ↓ |
             // | 0x00:0x1F | selector | 0x0000000000000000000000000000000000000000000000000000000000000001 |
-            success := staticcall(gas(), target, add(encodedParams, 0x20), mload(encodedParams), 0, 0x20)
+            success := iszero(extstaticcall(target, add(encodedParams, 0x20), mload(encodedParams)))
+            // TODO: Use RETURNDATALOAD when supported in solc
+            returndatacopy(0, 0, 0x20)
             returnSize := returndatasize()
             returnValue := mload(0)
         }

@@ -127,9 +127,12 @@ library P256 {
             // return `bytes32(0)` (i.e. false) without developers noticing, so we decide to evaluate the return value
             // without expanding memory using scratch space.
             mstore(0x00, 0) // zero out scratch space in case the precompile doesn't return anything
-            if iszero(staticcall(gas(), 0x100, ptr, 0xa0, 0x00, 0x20)) {
+            // TODO: use RETURNDATALOAD when supported in solc
+            if extstaticcall(0x100, ptr, 0xa0) {
                 invalid()
             }
+
+            returndatacopy(0x00, 0x00, 0x20)
             isValid := mload(0x00)
         }
     }

@@ -23,7 +23,9 @@ library AuthorityUtils {
             mstore(0x00, 0x00)
             mstore(0x20, 0x00)
 
-            if staticcall(gas(), authority, add(data, 0x20), mload(data), 0x00, 0x40) {
+            if iszero(extstaticcall(authority, add(data, 0x20), mload(data))) {
+                // TODO: Use RETURNDATALOAD when supported in solc
+                returndatacopy(0x00, 0x00, 0x40)
                 immediate := mload(0x00)
                 delay := mload(0x20)
 

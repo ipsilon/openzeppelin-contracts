@@ -1,6 +1,6 @@
 [profile.default]
-solc_version = '0.8.24'
-evm_version = 'cancun'
+solc_version = '/Users/rodia/projects/solidity1/build/solc/solc'
+evm_version = 'osaka'
 optimizer = true
 optimizer-runs = 200
 src = 'contracts'
@@ -9,6 +9,7 @@ libs = ['node_modules', 'lib']
 test = 'test'
 cache_path  = 'cache_forge'
 fs_permissions = [{ access = "read", path = "./test/bin" }]
+eof = true
 
 [fuzz]
 runs = 5000
